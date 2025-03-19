@@ -1,0 +1,16 @@
+[
+    {
+        "id": 1,
+        "nombre": "atardecer oleo",
+        "img": "",
+        "precio": "100.000",
+        "descripcion": "asdddddasdasdasdasdasd"
+    },
+    {
+        "id": 2,
+        "nombre": "Retrato",
+        "img": "",
+        "precio": "90.000",
+        "descripcion": "asdddddasdasdasdasdasd"
+    }
+]

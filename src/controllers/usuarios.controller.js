@@ -1,4 +1,7 @@
 import usuarioModel from "../models/usuarios.model.js";
+import jwt from "jsonwebtoken";
+import config from "../config/config.js";
+
 
 export const getUsuarios = async (req, res) => {
     let data = await usuarioModel.find();
@@ -18,17 +21,25 @@ export const getUsuarioUnico = async (req, res) => {
 };
 
 export const loginUsuario = async (req,res) =>{
-    const {email, contrasena} = req.body
+    const {email, password} = req.body
+    console.log(email, password)
     try {
         const usuario = await usuarioModel.find({
             "email": email,
-            "contrasena": contrasena
+            "contrasena": password
         })
 
         if (usuario.length == 0) {
             return res.status(401).json({ message: "Credenciales inválidas" })
         }else{
-            res.status(200).json({ message: "Inicio de sesion exitoso", usuario });
+            console.log(config.JWT_SECRET)
+            const token = jwt.sign(
+                { id: usuario._id, email: usuario.email },
+                config.JWT_SECRET, 
+                { expiresIn: "1h" }  // El token expira en 1 hora
+            );
+            res.status(200).json({ message: "Inicio de sesion exitoso", usuario, token });
+            console.log("Usuario registrado exitosamente: " + usuario, token)
         }
         
 

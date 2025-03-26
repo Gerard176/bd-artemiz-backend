@@ -25,7 +25,7 @@ export const loginUsuario = async (req,res) =>{
     try {
         const usuario = await usuarioModel.find({
             "email": email,
-            "contrasena": password
+            "password": password
         })
         if (usuario.length == 0) {
             return res.status(401).json({ message: "Credenciales inválidas" })
@@ -48,11 +48,22 @@ export const loginUsuario = async (req,res) =>{
 
 export const registroUsuario = async (req, res) => {
     const imgPerf = "http://localhost:5000/uploads/usuario.png";
-    const { idUsuario, nombre, nickName, email, direccion, telefono, contrasena } =
+    const {nombre, nickName, email, direccion, telefono, password } =
     req.body;
     try {
-        const usuario = new usuarioModel({idUsuario, imgPerf, nombre, nickName, email, direccion, telefono, contrasena})
+        const usuarioRepetido = await usuarioModel.find({
+            "email": email,
+            "password": password
+        });
+        console.log(usuarioRepetido);
+        if (usuarioRepetido.length != 0){
+            return res.status(403).json({ error: "Este email ya se encuentra registrado" });
+        }
+
+        const usuario = new usuarioModel({imgPerf, nombre, nickName, email, direccion, telefono, password})
         await usuario.save();
+        console.log(usuario.email);
+        
         if (!usuario){
             return res.status(401).json({ error: "Se ingresaron erroneamente los campos" });
         }

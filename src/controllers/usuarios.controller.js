@@ -48,7 +48,7 @@ export const loginUsuario = async (req,res) =>{
 
 export const registroUsuario = async (req, res) => {
     const imgPerf = "http://localhost:5000/uploads/usuario.png";
-    const {nombre, nickName, email, direccion, telefono, password } =
+    const {nombre, apellido, cedula, nickName, email, direccion, telefono, password } =
     req.body;
     try {
         const usuarioRepetido = await usuarioModel.find({
@@ -59,8 +59,8 @@ export const registroUsuario = async (req, res) => {
         if (usuarioRepetido.length != 0){
             return res.status(403).json({ error: "Este email ya se encuentra registrado" });
         }
-
-        const usuario = new usuarioModel({imgPerf, nombre, nickName, email, direccion, telefono, password})
+        console.log(req.body);
+        const usuario = new usuarioModel({imgPerf, nombre, apellido, cedula, nickName, email, direccion, telefono, password})
         await usuario.save();
         console.log(usuario.email);
         
@@ -75,19 +75,19 @@ export const registroUsuario = async (req, res) => {
 };
 
 export const actualizarUsuario = async (req,res) =>{
-    const idUsuario = req.params.id;
-    const { nombre, nickName, email, direccion, telefono, contrasena} = req.body;
+    const { cedula, nombre, nickName, apellido, direccion, telefono} = req.body;
+    console.log(req.body);
     try {
-        const usuarioActualizado = await usuarioModel.updateOne({ "idUsuario": idUsuario },
+        const usuarioActualizado = await usuarioModel.updateOne({ "cedula": cedula },
             { $set: {
                 "nombre": nombre, 
+                "apellido": apellido, 
                 "nickName": nickName, 
-                "email": email,
                 "direccion":direccion, 
                 "telefono": telefono, 
-                "contrasena":contrasena 
             } }
         );
+        console.log(usuarioActualizado);
         if (!usuarioActualizado) return res.status(404).json({ mensaje: "Usuario no encontrado" });
         res.json(usuarioActualizado);
     } catch (error) {

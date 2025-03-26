@@ -9,6 +9,6 @@ routerUsuarios.get('/usuarios/perfil', verificarToken, usuariosController.getPer
 routerUsuarios.post('/usuarios/registro', usuariosController.registroUsuario);
 routerUsuarios.post('/usuarios/login', usuariosController.loginUsuario);
 routerUsuarios.delete('/usuarios/:id', usuariosController.eliminarUsuario);
-routerUsuarios.put('/usuarios/:id', usuariosController.actualizarUsuario);
+routerUsuarios.put('/usuarios/:id', verificarToken , usuariosController.actualizarUsuario);
 
 export default routerUsuarios;

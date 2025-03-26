@@ -3,7 +3,6 @@ import config from "../config/config.js";
 
 export const verificarToken = (req, res, next) => {
     const token = req.header("token");
-    console.log(token);
     if (!token) {
         return res.status(401).json({ message: "Acceso denegado" });
     }

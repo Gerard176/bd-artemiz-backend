@@ -11,35 +11,31 @@ export const getUsuarios = async (req, res) => {
     });
 };
 
-export const getUsuarioUnico = async (req, res) => {
-    let idUsuario = req.params.id;
-    let data = await usuarioModel.find({ idUsuario: idUsuario });
+export const getPerfil = async (req, res) => {
+    const {id} = req.usuario;
+    let data = await usuarioModel.find({ _id: id });
+    console.log("datos de perfil:" + data[0]);
     res.status(200).json({
-        msg: "usuario unico",
-        data: data,
+        data: data[0],
     });
 };
 
 export const loginUsuario = async (req,res) =>{
     const {email, password} = req.body
-    console.log(email, password)
     try {
         const usuario = await usuarioModel.find({
             "email": email,
             "contrasena": password
         })
-
         if (usuario.length == 0) {
             return res.status(401).json({ message: "Credenciales inválidas" })
         }else{
-            console.log(config.JWT_SECRET)
             const token = jwt.sign(
-                { id: usuario._id, email: usuario.email },
+                { id: usuario[0]._id, email: usuario[0].email },
                 config.JWT_SECRET, 
                 { expiresIn: "1h" }  // El token expira en 1 hora
             );
             res.status(200).json({ message: "Inicio de sesion exitoso", usuario, token });
-            console.log("Usuario registrado exitosamente: " + usuario, token)
         }
         
 
@@ -51,7 +47,7 @@ export const loginUsuario = async (req,res) =>{
 
 
 export const registroUsuario = async (req, res) => {
-    const imgPerf = "../../public/img/usuario.png";
+    const imgPerf = "http://localhost:5000/uploads/usuario.png";
     const { idUsuario, nombre, nickName, email, direccion, telefono, contrasena } =
     req.body;
     try {
@@ -102,7 +98,7 @@ export const eliminarUsuario = async (req,res) =>{
 
 export default {
   getUsuarios,
-  getUsuarioUnico,
+  getPerfil,
   registroUsuario,
   loginUsuario,
   actualizarUsuario,

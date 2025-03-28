@@ -14,7 +14,7 @@ app.use(express.json());
 app.use(routerGeneral);
 conectarDB();
 
-app.use( '/uploads' , express.static("public/img", {extensions: ["png"]}));
+app.use( '/uploads' , express.static("public/img"));
 
 
 

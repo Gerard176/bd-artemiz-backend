@@ -15,6 +15,8 @@ app.use(routerGeneral);
 conectarDB();
 
 app.use( '/uploads' , express.static("public/img"));
+app.use( '/obras' , express.static("public/img/obras"));
+
 
 
 

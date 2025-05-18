@@ -1,4 +1,3 @@
-import { json } from "express";
 import obraModel from "../models/Obras.model.js";
 
 //Obtener todas las obras 
@@ -15,7 +14,7 @@ export const getObra = async (req, res) =>{
         
         let obra = await obraModel.find({ _id: id});
         res.status(200).json({
-            obra: obra
+            obra: obra[0]
         });
     } catch (error) {
         res.status(400).json({

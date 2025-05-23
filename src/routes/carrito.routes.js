@@ -3,8 +3,8 @@ import carritoController from "../controllers/carrito.controller.js";
 
 const routerCarrito = Router();
 
-routerCarrito.get("/carrito", carritoController.getCarrito);
-routerCarrito.post("/carrito/add", carritoController.addItemCarrito);
+routerCarrito.get("/carrito/:idUsuario", carritoController.getCarrito);
+routerCarrito.post("/carrito/add/", carritoController.addItemCarrito);
 routerCarrito.delete("/carrito/delete/:id", carritoController.deleteItemCarrito);
 
 

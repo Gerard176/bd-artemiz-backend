@@ -1,7 +1,6 @@
 import usuarioModel from "../models/usuarios.model.js";
 import jwt from "jsonwebtoken";
 import config from "../config/config.js";
-import { json } from "stream/consumers";
 import { error } from "console";
 
 export const getUsuarios = async (req, res) => {

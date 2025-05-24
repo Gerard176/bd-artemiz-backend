@@ -1,0 +1,77 @@
+import favoritoModel from "../models/favorito.model.js";
+import obraModel from "../models/Obras.model.js";
+import mongoose from "mongoose";
+
+
+//Obtener todas las obras en el favorito
+export const getFavorito = async (req, res) => {
+  try {
+    const idUsuario = req.params.idUsuario;
+
+    const data = await favoritoModel.aggregate([
+      { $match: { idUsuario: new mongoose.Types.ObjectId(idUsuario) } }, //transformamos el string de idUsuario en un objeto de id de mongo
+    ]);
+
+    res.status(200).json({ data });
+  } catch (error) {
+    res.status(500).json({ message: "Error al obtener el favorito del usuario", error });
+  }
+};
+
+//agregar una obra al favorito
+export const addItemFavorito = async (req, res) => {
+    try {
+        const idUsuario = req.body.idUsuario;
+        const idItem = req.body.idItem;
+
+        const item = await obraModel.findOne({_id: idItem});
+        console.log(item);
+
+        const nuevoItem = new favoritoModel({
+            _id:item._id,
+            idUsuario: idUsuario, 
+            categoria: item.categoria,
+            tamaño: item.tamaño,
+            nombre: item.nombre,
+            autor: item.autor,
+            img: item.img,
+            precio: item.precio,
+            descripcion: item.descripcion,
+        });
+        console.log(nuevoItem);
+        await nuevoItem.save();// Guardar en la base de datos
+
+        res.status(200).json({
+            message: "Obra agregada al favorito",
+            data: nuevoItem
+        });
+
+    } catch (error) {
+        res.status(500).json({ message: "Error al agregar la obra al favorito", error });
+    }
+};
+
+//eliminar una obra del favorito
+export const deleteItemFavorito = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const item = await favoritoModel.findOne({_id: id });
+        console.log(item)
+        if (item.length == 0) return res.status(404).json({mensaje:"No se encontro el item a eliminar en el favorito"});
+
+        await favoritoModel.deleteOne({ _id: id});
+        res.status(200).json({
+            message: "Obra eliminada del favorito",
+            data: item
+        });
+
+    } catch (error) {
+        res.status(500).json({ message: "Error al eliminar la obra del favorito", error });
+    }
+};
+
+export default {
+    getFavorito,
+    addItemFavorito,
+    deleteItemFavorito
+}

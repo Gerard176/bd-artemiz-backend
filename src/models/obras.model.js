@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 
 const obraSchema = new mongoose.Schema({
+    idUsuario:{type: String, required: true},
     nombre:{type: String, required: true},
     autor:{type: String, required: true},
     tamaño: {type: String, required: true},

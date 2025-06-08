@@ -1,4 +1,4 @@
-import Router from "express";
+import {Router} from "express";
 import obrasController from "../controllers/obras.controller.js";
 
 const routerObras = Router();

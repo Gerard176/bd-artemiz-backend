@@ -3,7 +3,7 @@ import obraModel from "../models/Obras.model.js";
 //Obtener todas las obras
 export const getObras = async (req, res) => {
     try {
-        const limit = parseInt(req.query.limit) || 5;
+        const limit = parseInt(req.query.limit) || 17;
         const skip = parseInt(req.query.skip) || 0;
 
         // Parámetros opcionales para filtrar y ordenar
@@ -36,21 +36,22 @@ export const getObras = async (req, res) => {
 
 
 // Obtener una sola obra
-export const getObra = async (req, res) =>{
-    const {id} = req.params;
+export const getObra = async (req, res) => {
+    const { id } = req.params;
     try {
-        
-        let obra = await obraModel.find({ _id: id});
-        res.status(200).json({
-            obra: obra[0]
-        });
+        const obra = await obraModel.findById(id);
+
+        if (!obra) {
+            return res.status(404).json({ error: 'Obra no encontrada' });
+        }
+
+        res.status(200).json(obra);
     } catch (error) {
-        res.status(400).json({
-            error: "Error interno del servidor: " + error
+        res.status(500).json({
+            error: "Error interno del servidor: " + error.message
         });
     }
 }
-
 export default {
     getObras,
     getObra,

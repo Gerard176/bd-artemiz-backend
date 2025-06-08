@@ -19,11 +19,26 @@ export const getResenas = async (req, res) => {
                 $unwind: "$usuario" // desestructuramos el array `usuario` en un solo objeto
             },
             {
+                $lookup: {
+                    from: "obras", // nombre de la colección en MongoDB
+                    localField: "idObra",
+                    foreignField: "_id",
+                    as: "obra"
+                }
+            },
+            {
+                $unwind: "$usuario" // desestructuramos el array `usuario` en un solo objeto
+            },
+            {
                 $project: {
                     contenido: 1,
                     valoracion: 1,
                     fecha: 1,
                     likes: 1,
+                    obra:{
+                        nombre: 1,
+                        autor: 1
+                    },
                     usuario: {
                         nombre: 1,
                         email: 1,

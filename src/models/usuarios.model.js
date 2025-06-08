@@ -7,7 +7,7 @@ const usuarioSchema = new mongoose.Schema({
     cedula: {type: Number, required: true},
     nickName:{type: String, required: true},
     email:{type: String, required: true},
-    password:{type: String, required: true},
+    password:{type: String, required: true, minlenght: 7},
     direccion:{type: String, required: true},
     telefono:{type: Number, required: true},
 });

@@ -2,6 +2,7 @@ import usuarioModel from "../models/usuarios.model.js";
 import jwt from "jsonwebtoken";
 import config from "../config/config.js";
 import { error } from "console";
+import bcrypt from "bcryptjs";
 
 export const getUsuarios = async (req, res) => {
     let data = await usuarioModel.find();
@@ -73,8 +74,11 @@ export const registroUsuario = async (req, res) => {
         // if (usuarioRepetido.cedula == cedula) {
         //     return res.status(405).json({error: "Esta cedula ya se encuentra registrada"});
         // }
-        console.log(req.body);
-        const usuario = new usuarioModel({ imgPerf, nombre, apellido, cedula, nickName, email, direccion, telefono, password })
+       // Encriptar la contraseña
+       console.log("hashedPassword");
+        const salt = await bcrypt.genSalt(10); // número de rondas (más alto = más seguro y más lento)
+        const hashedPassword = await bcrypt.hash(password, salt);
+        const usuario = new usuarioModel({ imgPerf, nombre, apellido, cedula, nickName, email, direccion, telefono, password: hashedPassword })
         await usuario.save();
         console.log(usuario.email);
 

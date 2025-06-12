@@ -15,6 +15,8 @@ export const getCarrito = async (req, res) => {
           nombre: 1,
           precio: 1,
           cantidad: 1,
+          img: 1,
+          autor: 1,
           subtotal: { $multiply: ["$precio", "$cantidad"] }
         }
       },
@@ -28,7 +30,9 @@ export const getCarrito = async (req, res) => {
               nombre: "$nombre",
               precio: "$precio",
               cantidad: "$cantidad",
-              subtotal: "$subtotal"
+              subtotal: "$subtotal",
+              img: "$img",
+              autor: "$autor"
             }
           }
         }

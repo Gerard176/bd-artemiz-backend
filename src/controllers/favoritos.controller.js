@@ -20,15 +20,14 @@ export const getFavorito = async (req, res) => {
 
 //agregar una obra al favorito
 export const addItemFavorito = async (req, res) => {
-    try {
+    // try {
         const idUsuario = req.body.idUsuario;
         const idItem = req.body.idItem;
-
+        console.log(idItem,idUsuario)
         const item = await obraModel.findOne({_id: idItem});
-        console.log(item);
 
         const nuevoItem = new favoritoModel({
-            _id:item._id,
+            idObra:idItem,
             idUsuario: idUsuario, 
             categoria: item.categoria,
             tamaño: item.tamaño,
@@ -38,7 +37,6 @@ export const addItemFavorito = async (req, res) => {
             precio: item.precio,
             descripcion: item.descripcion,
         });
-        console.log(nuevoItem);
         await nuevoItem.save();// Guardar en la base de datos
 
         res.status(200).json({
@@ -46,9 +44,9 @@ export const addItemFavorito = async (req, res) => {
             data: nuevoItem
         });
 
-    } catch (error) {
-        res.status(500).json({ message: "Error al agregar la obra al favorito", error });
-    }
+    // } catch (error) {
+    //     res.status(500).json({ message: "Error al agregar la obra al favorito", error });
+    // }
 };
 
 //eliminar una obra del favorito

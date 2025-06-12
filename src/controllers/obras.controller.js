@@ -3,7 +3,7 @@ import obraModel from "../models/Obras.model.js";
 //Obtener todas las obras
 export const getObras = async (req, res) => {
     try {
-        const limit = parseInt(req.query.limit) || 17;
+        const limit = parseInt(req.query.limit) || 20;
         const skip = parseInt(req.query.skip) || 0;
 
         // Parámetros opcionales para filtrar y ordenar

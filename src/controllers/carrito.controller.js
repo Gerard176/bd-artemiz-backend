@@ -2,28 +2,29 @@ import carritoModel from "../models/carrito.model.js";
 import obraModel from "../models/Obras.model.js";
 import mongoose from "mongoose";
 
-
-//Obtener todas las obras en el carrito
+// Obtener todas las obras en el carrito de un usuario
 export const getCarrito = async (req, res) => {
   try {
     const idUsuario = req.params.idUsuario;
 
     const data = await carritoModel.aggregate([
-      { $match: { idUsuario: new mongoose.Types.ObjectId(idUsuario) } }, //transformamos el string de idUsuario en un objeto de id de mongo
-      {//procerdemos a decirle que variables queremos que se muestren y agregamos la variable subtotal
+      { $match: { idUsuario: new mongoose.Types.ObjectId(idUsuario) } },
+      {
         $project: {
+          _id: 1,
           nombre: 1,
           precio: 1,
           cantidad: 1,
           subtotal: { $multiply: ["$precio", "$cantidad"] }
         }
       },
-      {//Ordenamos todo para mostrarlo segun el usuario logueado y agregamos un subtotal
+      {
         $group: {
-          _id: idUsuario,
+          _id: "$idUsuario",
           totalGastado: { $sum: "$subtotal" },
           items: {
             $push: {
+              _id: "$_id",
               nombre: "$nombre",
               precio: "$precio",
               cantidad: "$cantidad",
@@ -40,61 +41,115 @@ export const getCarrito = async (req, res) => {
   }
 };
 
-//agregar una obra al carrito
+// Agregar una obra al carrito
 export const addItemCarrito = async (req, res) => {
-    try {
-        const idUsuario = req.body.idUsuario;
-        const idItem = req.body.idItem;
+  try {
+    const { idUsuario, idItem } = req.body;
 
-        const item = await obraModel.findOne({_id: idItem});
-        console.log(item.categoria);
-
-        const nuevoItem = new carritoModel({
-            _id:item._id,
-            idUsuario: idUsuario, 
-            categoria: item.categoria,
-            tamaño: item.tamaño,
-            nombre: item.nombre,
-            autor: item.autor,
-            img: item.img,
-            precio: item.precio,
-            descripcion: item.descripcion,
-            cantidad: 1
-        });
-        console.log(nuevoItem);
-        await nuevoItem.save();// Guardar en la base de datos
-
-        res.status(200).json({
-            message: "Obra agregada al carrito",
-            data: nuevoItem
-        });
-
-    } catch (error) {
-        res.status(500).json({ message: "Error al agregar la obra al carrito", error });
+    if (!idUsuario || !idItem) {
+      return res.status(400).json({ message: "Faltan datos requeridos: idUsuario o idItem" });
     }
+
+    const item = await obraModel.findById(idItem);
+    if (!item) return res.status(404).json({ message: "La obra no existe" });
+
+    // Buscar si la obra ya está en el carrito del usuario
+    const itemExistente = await carritoModel.findOne({ idUsuario, idObra: item._id });
+
+    if (itemExistente) {
+      // Si ya existe, incrementamos la cantidad en 1
+      itemExistente.cantidad += 1;
+      await itemExistente.save();
+
+      return res.status(200).json({
+        message: "Cantidad actualizada en el carrito",
+        data: itemExistente
+      });
+    }
+
+    // Si no existe, lo agregamos por primera vez
+    const nuevoItem = new carritoModel({
+      idUsuario,
+      idObra: item._id,
+      categoria: item.categoria,
+      tamaño: item.tamaño,
+      nombre: item.nombre,
+      autor: item.autor,
+      img: item.img,
+      precio: item.precio,
+      descripcion: item.descripcion,
+      cantidad: 1
+    });
+
+    await nuevoItem.save();
+
+    res.status(200).json({
+      message: "Obra agregada al carrito",
+      data: nuevoItem
+    });
+
+  } catch (error) {
+    console.error("Error en addItemCarrito:", error);
+    res.status(500).json({ message: "Error al agregar la obra al carrito", error });
+  }
+};
+export const updateCantidad = async (req, res) => {
+  try {
+    const idItem = req.params.idItem;
+    const { cantidad } = req.body;
+
+    if (!cantidad || cantidad < 1) {
+      return res.status(400).json({ message: 'Cantidad inválida' });
+    }
+
+    const item = await carritoModel.findById(idItem);
+    if (!item) return res.status(404).json({ message: 'Item no encontrado' });
+
+    item.cantidad = cantidad;
+    await item.save();
+
+    res.status(200).json({
+      message: 'Cantidad actualizada correctamente',
+      item: {
+        _id: item._id,
+        cantidad: item.cantidad,
+        subtotal: item.precio * item.cantidad,
+      }
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error al actualizar cantidad', error });
+  }
 };
 
-//eliminar una obra del carrito
+
+
+
+// Eliminar una obra del carrito
 export const deleteItemCarrito = async (req, res) => {
-    try {
-        const id = req.params.id;
-        const item = await carritoModel.find({_id: id });
-        console.log(item)
-        if (item.length == 0) return res.status(404).json({mensaje:"No se encontro el item a eliminar en el carrito"});
+  try {
+    const id = req.params.id;
 
-        await carritoModel.deleteOne({ _id: id});
-        res.status(200).json({
-            message: "Obra eliminada del carrito",
-            data: item
-        });
+    const item = await carritoModel.findById(id);
 
-    } catch (error) {
-        res.status(500).json({ message: "Error al eliminar la obra del carrito", error });
+    if (!item) {
+      return res.status(404).json({ message: "No se encontró el item a eliminar en el carrito" });
     }
+
+    await carritoModel.deleteOne({ _id: id });
+
+    res.status(200).json({
+      message: "Obra eliminada del carrito",
+      data: item
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error al eliminar la obra del carrito", error });
+  }
 };
 
 export default {
-    getCarrito,
-    addItemCarrito,
-    deleteItemCarrito
-}
+  getCarrito,
+  addItemCarrito,
+  deleteItemCarrito,
+  updateCantidad
+};

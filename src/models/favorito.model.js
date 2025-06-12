@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
 
 const ItemFavoritoSchema = new mongoose.Schema({
-    _id: { type: mongoose.Schema.Types.ObjectId},
-    idUsuario:{ type: mongoose.Schema.Types.ObjectId},
+    idUsuario: { type: mongoose.Schema.Types.ObjectId, required: true },
+    idObra: { type: mongoose.Schema.Types.ObjectId, required: true },
     categoria:{ type: String, required: true},
     tamaño:{type: String, required: true},
     nombre:{type: String, required: true},

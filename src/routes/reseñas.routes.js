@@ -6,6 +6,8 @@ const routerResenas = Router();
 routerResenas.get("/resenas/:id", reseñaController.getResenas);
 routerResenas.post("/resenas/postear", reseñaController.postResena);
 routerResenas.delete("/resenas/eliminar", reseñaController.deleteResena);
+routerResenas.put("/resenas/editar", reseñaController.editarResena);
+
 
 
 export default routerResenas;

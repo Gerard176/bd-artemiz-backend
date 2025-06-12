@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const ItemCarritoSchema = new mongoose.Schema({
-    _id: { type: mongoose.Schema.Types.ObjectId},
+     idObra: { type: mongoose.Schema.Types.ObjectId, ref: "Obra", required: true },
     idUsuario:{ type: mongoose.Schema.Types.ObjectId},
     categoria:{ type: String, required: true},
     tamaño:{type: String, required: true},

@@ -82,28 +82,49 @@ export const postResena = async (req,res) =>{
     }
 }
 
-export const deleteResena = async (req, res) => {
-    const {idUsuario, idResena,} = req.body;
-    // try {
-        const reseña = await reseñaModel.findOne({_id: idResena });
-        const usuario = await usuarioModel.findOne({_id: idUsuario });
-        console.log(reseña.idUsuario, usuario._id)
-        if (reseña.idUsuario.toString() !== usuario._id.toString()) {
-            return res.status(404).json({mensaje:"El usuario que esta intentando eliminar no creó el comentario"});
-        }
+export const editarResena = async (req, res) => {
+  const { idResena, idUsuario, contenido, valoracion } = req.body;
 
-        await reseñaModel.deleteOne({ _id: reseña._id});
-        res.status(200).json({
-            message: "Reseña eliminada",
-            data: reseña
-        });
+  try {
+    const reseña = await reseñaModel.findOne({ _id: idResena });
+    if (!reseña) return res.status(404).json({ mensaje: "Reseña no encontrada" });
 
-    // } catch (error) {
-    //     res.status(500).json({ message: "Error al eliminar la reseña", error });
-    // }
+    if (reseña.idUsuario.toString() !== idUsuario) {
+      return res.status(403).json({ mensaje: "No puedes editar esta reseña" });
+    }
+
+    reseña.contenido = contenido;
+    reseña.valoracion = valoracion;
+    await reseña.save();
+
+    res.status(200).json({ mensaje: "Reseña actualizada", data: reseña });
+  } catch (error) {
+    res.status(500).json({ mensaje: "Error al editar reseña", error });
+  }
 };
+
+export const deleteResena = async (req, res) => {
+  const { idUsuario, idResena } = req.body;
+
+  try {
+    const reseña = await reseñaModel.findOne({ _id: idResena });
+    if (!reseña) return res.status(404).json({ mensaje: "Reseña no encontrada" });
+
+    if (reseña.idUsuario.toString() !== idUsuario) {
+      return res.status(403).json({ mensaje: "No puedes eliminar esta reseña" });
+    }
+
+    await reseñaModel.deleteOne({ _id: idResena });
+
+    res.status(200).json({ mensaje: "Reseña eliminada", data: reseña });
+  } catch (error) {
+    res.status(500).json({ mensaje: "Error al eliminar la reseña", error });
+  }
+};
+
 export default {
-    getResenas,
-    postResena,
-    deleteResena
-}
+  getResenas,
+  postResena,
+  editarResena,
+  deleteResena
+};

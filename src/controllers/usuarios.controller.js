@@ -34,16 +34,23 @@ export const getPerfil = async (req, res) => {
 
 export const loginUsuario = async (req, res) => {
     const { email, password } = req.body
+
     try {
-        const usuario = await usuarioModel.find({
-            "email": email,
-            "password": password
+        const usuario = await usuarioModel.findOne({
+            "email": email
         })
-        if (usuario.length == 0) {
+        console.log(email, password);
+        console.log(usuario);
+
+
+        const isMatch = await bcrypt.compare(password, usuario.password);
+        console.log(isMatch);
+
+        if (!isMatch) {
             return res.status(401).json({ message: "Credenciales inválidas" })
         } else {
             const token = jwt.sign(
-                { id: usuario[0]._id, email: usuario[0].email },
+                { id: usuario._id, email: usuario.email },
                 config.JWT_SECRET,
                 { expiresIn: "1h" }  // El token expira en 1 hora
             );
